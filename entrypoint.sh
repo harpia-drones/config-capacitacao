@@ -2,8 +2,13 @@
 
 # Path to config folder
 CONFIG_FOLDER_PATH="/root/config"
-DEPEND_FOLDER_PATH="/root/dependencies"
 HARPIA_CONFIG_FOLDER_PATH="/home/harpia/config"
+
+# Path to dependencies folder
+DEPEND_FOLDER_PATH="/root/dependencies"
+
+# Flag file to verify dependencies folder
+DEP_FLAG_FILE="$DEPEND_FOLDER_PATH/package_creation/templates/minimum_node.py"
 
 # Path to a flag file indicating that the script has already run
 FLAG_FILE_I="$CONFIG_FOLDER_PATH/.setup_done_i"
@@ -15,7 +20,7 @@ WS_DIR_PATH=$(find "$HOME" -type d -name "*_ws" -print -quit)
 
 echo "Checking pre-requirements..."
 
-if [ ! -f "$DEPEND_FOLDER_PATH" ]; then
+if [ ! -f "$DEP_FLAG_FILE" ]; then
 
     # Clone dependencies folder 
     echo ">> Cloning make dependencies folder..."
