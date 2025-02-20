@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Path to config folder
-CONFIG_FOLDER_PATH="/$HOME/config"
+CONFIG_FOLDER_PATH="$HOME/config"
+DEPEND_FOLDER_PATH="$HOME/dependencies"
 
 # Path to a flag file indicating that the script has already run
 FLAG_FILE_I="$CONFIG_FOLDER_PATH/.setup_done_i"
@@ -13,10 +14,29 @@ WS_DIR_PATH=$(find "$HOME" -type d -name "*_ws" -print -quit)
 
 echo "Checking pre-requirements..."
 
+if [ ! -f "$DEPEND_FOLDER_PATH" ]; then
+
+    # Clone dependencies folder 
+    echo ">> Cloning make dependencies folder..."]
+    echo ""
+    cd "$HOME" && \
+    git clone git@github.com:harpia-drones/dependencies.git && \
+
+    if [ $? -eq 0 ]; then
+        mv "$DEPEND_FOLDER_PATH/Makefile" "$WS_DIR_PATH/src/"
+    else
+        echo ""
+        echo "Error when cloning make dependencies folder."
+        echo ">> Configuration aborted."
+
+        # Exit the script returing a failure code
+        exit 1
+    fi
+fi
+
 # Try to source the python virtual environment
 source "/$HOME/harpia_venv/bin/activate"
 
-# Create the venv if it was not created before
 if [ $? -eq 1 ]; then
 
     echo ""
