@@ -13,7 +13,6 @@ DEP_FLAG_FILE="$DEPEND_FOLDER_PATH/package_creation/templates/minimum_node.py"
 # Path to a flag file indicating that the script has already run
 FLAG_FILE_I="$CONFIG_FOLDER_PATH/.setup_done_i"
 FLAG_FILE_II="$CONFIG_FOLDER_PATH/.setup_done_ii"
-FLAG_FILE_III="$CONFIG_FOLDER_PATH/.setup_done_iii"
 
 # Path to ros2 workspace
 WS_DIR_PATH=$(find "$HOME" -type d -name "*_ws" -print -quit)
@@ -196,7 +195,6 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
 
         # Create the flag file
         touch "$FLAG_FILE_II"
-        chmod a+r "$FLAG_FILE_II"
             
         echo ""
         echo "=================================================================="
