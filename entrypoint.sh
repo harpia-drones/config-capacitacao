@@ -1,9 +1,12 @@
 #!/bin/bash
 
+# Path to config folder
+CONFIG_FOLDER_PATH="/$HOME/config"
+
 # Path to a flag file indicating that the script has already run
-FLAG_FILE_I="/root/config/.setup_done_i"
-FLAG_FILE_II="/root/config/.setup_done_ii"
-FLAG_FILE_III="/root/config/.setup_done_iii"
+FLAG_FILE_I="$CONFIG_FOLDER_PATH/.setup_done_i"
+FLAG_FILE_II="$CONFIG_FOLDER_PATH/.setup_done_ii"
+FLAG_FILE_III="$CONFIG_FOLDER_PATH/.setup_done_iii"
 
 # Path to ros2 workspace
 WS_DIR_PATH=$(find "$HOME" -type d -name "*_ws" -print -quit)
@@ -11,7 +14,7 @@ WS_DIR_PATH=$(find "$HOME" -type d -name "*_ws" -print -quit)
 echo "Checking pre-requirements..."
 
 # Try to source the python virtual environment
-source /root/harpia_venv/bin/activate
+source "/$HOME/harpia_venv/bin/activate"
 
 # Create the venv if it was not created before
 if [ $? -eq 1 ]; then
@@ -26,15 +29,15 @@ if [ $? -eq 1 ]; then
     apt-get update && \
     apt-get install -y python3-venv && \
 
-    # Create the virtual environment in /root
-    cd /root/ && \
+    # Create the virtual environment in /$HOME
+    cd "/$HOME/" && \
     python3 -m venv harpia_venv && \
 
     # Activate the virtual environment
-    source /root/harpia_venv/bin/activate && \
+    source "/$HOME/harpia_venv/bin/activate" && \
 
     # Configure to activate venv everytime a new bash terminal is open
-    echo "source /root/harpia_venv/bin/activate" >> /root/.bashrc
+    echo "source /$HOME/harpia_venv/bin/activate" >> "/$HOME/.bashrc"
 
     # Validate the venv creation
     if [ $? -eq 1 ]; then        
@@ -61,7 +64,7 @@ if [ ! -f "$FLAG_FILE_I" ]; then
     apt-get upgrade -y
     
     # Install the PX4 development toolchain to use the simulator
-    cd /root/ && \
+    cd "/$HOME/" && \
     git clone https://github.com/PX4/PX4-Autopilot.git --recursive && \
     bash ./PX4-Autopilot/Tools/setup/ubuntu.sh 
     
@@ -83,7 +86,7 @@ if [ ! -f "$FLAG_FILE_I" ]; then
         exit 0
     else
         echo ""
-        echo "Error when running setup.sh for the first time."
+        echo "Error when running configuration script for the first time."
         echo ">> Configuration aborted."
 
         # Exit the script returing a failure code
@@ -105,7 +108,7 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
     apt-get install -y ros-dev-tools
 
     # Install XRCE-DDS Agent
-    cd /root/ && \
+    cd "/$HOME/" && \
     git clone https://github.com/eProsima/Micro-XRCE-DDS-Agent.git && \
     cd Micro-XRCE-DDS-Agent && \
     mkdir build && \
@@ -127,8 +130,8 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
     cd "$WS_DIR_PATH" && \
     colcon build --packages-ignore bringup description interfaces
 
-    # Create a password to root
-    echo 'root:senha' | chpasswd
+    # Create a password to $HOME
+    echo '$HOME:senha' | chpasswd
 
     # Create a new user named harpia
     useradd -m -s /bin/bash harpia && \
@@ -164,7 +167,7 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
         exit 0
     else
         echo ""
-        echo "Error when running setup.sh for the sencond time."
+        echo "Error when running configuration script for the sencond time."
         echo ">> Configuration aborted."
 
         # Exit the script returing a failure code
@@ -189,8 +192,8 @@ elif [ ! -f "$FLAG_FILE_III" ]; then
         echo "export DISPLAY=:0" >> /home/harpia/.bashrc
 
         # Create an alias to open QGroundControl
-        echo "" >> /root/bashrc
-        echo 'alias qgc=su - harpia -c "/usr/local/bin/QGroundControl.AppImage"' >> /root/.bashrc
+        echo "" >> "/$HOME/bashrc"
+        echo 'alias qgc=su - harpia -c "/usr/local/bin/QGroundControl.AppImage"' >> "/$HOME/.bashrc"
 
         # Create the flag file
         touch "$FLAG_FILE_III"
@@ -207,7 +210,7 @@ elif [ ! -f "$FLAG_FILE_III" ]; then
         exit 0
     else
         echo ""
-        echo "Error when running setup.sh for the third time."
+        echo "Error when running configuration script for the third time."
         echo ">> Configuration aborted."
             
         # Exit the script returing a failure code
@@ -215,7 +218,7 @@ elif [ ! -f "$FLAG_FILE_III" ]; then
     fi
 else
     echo ""
-    echo "Environment already ready to use."
+    echo "Environment is already ready to use."
     echo ""
 
     # Exit the script returing a success code
