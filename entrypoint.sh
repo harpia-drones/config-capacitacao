@@ -175,28 +175,33 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
     # Give permissions to harpia run sudo without password
     echo "harpia ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
 
+    # Allow display to harpia
+    echo "" >> /home/harpia/.bashrc
+    echo "export DISPLAY=:0" >> /home/harpia/.bashrc
+
     # Create a config folde in /home/harpia
-    mkdir -p "$$HARPIA_CONFIG_FOLDER_PATH"
+    mkdir -p "$HARPIA_CONFIG_FOLDER_PATH" && \
 
     # Clone qgc_install.sh script
     curl -L "https://raw.githubusercontent.com/harpia-drones/config/refs/heads/main/qgc_install.sh" -o "$HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh" && \
     chmod a+rwx "$HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh" && \
-
-    # Run qgc install script for the first time
-    su - harpia -c "bash $HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh"
+    
+    # Create an alias to install qgc
+    echo " " >> /home/harpia/.bashrc && \
+    echo "# Create an alias to install QGroundControl" >> /home/harpia/.bashrc && \
+    echo "alias setup='bash $HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh'" >> /home/harpia/.bashrc && \
 
     # Verify if the last command return 0 (succesfully executed)
     if [ $? -eq 0 ]; then
 
         # Create the flag file
         touch "$FLAG_FILE_II"
+        chmod a+r "$FLAG_FILE_II"
             
         echo ""
         echo "=================================================================="
         echo "  Second part of cofiguration completed successfully!"               
         echo "=================================================================="
-        echo ""
-        echo ">> You must restart the container."
         echo ""
 
         # Exit the script returing a failure code
@@ -209,52 +214,9 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
         # Exit the script returing a failure code
         exit 1
     fi
-elif [ ! -f "$FLAG_FILE_III" ]; then
-
-    echo ""
-    echo "=================================================================="
-    echo "  Starting the third part of configuration...            "           
-    echo "=================================================================="
-    echo ""
-
-    # Run qgc install script for the second time
-    su - harpia -c "bash $HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh"
-
-    # Verify if the last command return 0 (succesfully executed)
-    if [ $? -eq 0 ]; then
-
-        # Allow harpia user to open display
-        echo "" >> /home/harpia/.bashrc
-        echo "export DISPLAY=:0" >> /home/harpia/.bashrc
-
-        # Create an alias to open QGroundControl
-        echo "" >> "/root/bashrc"
-        echo 'alias qgc=su - harpia -c "/usr/local/bin/QGroundControl.AppImage"' >> "/root/.bashrc"
-
-        # Create the flag file
-        touch "$FLAG_FILE_III"
-
-        echo ""
-        echo "=================================================================="
-        echo "   Third part of cofiguration completed successfully!"               
-        echo "=================================================================="
-        echo ""
-        echo ">> The environment is ready to use!"
-        echo ""
-
-        # Exit the script returing a success code
-        exit 0
-    else
-        echo ""
-        echo "Error when running configuration script for the third time."
-        echo ">> Configuration aborted."
-            
-        # Exit the script returing a failure code
-        exit 1
-    fi
 else
     echo ""
-    echo "Environment is already ready to use."
+    echo "All the configurations for root is done. Check configurations for harpia."
     echo ""
 
     # Exit the script returing a success code

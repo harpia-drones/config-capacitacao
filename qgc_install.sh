@@ -3,7 +3,7 @@
 CONFIG_FOLDER_PATH="$HOME/config"
 
 # Path to a flag file indicating that the script has already run
-QGC_FLAG_FILE_I="$CONFIG_FOLDER_PATH/.qgc_setup_done_ii"
+QGC_FLAG_FILE_I="$CONFIG_FOLDER_PATH/.qgc_setup_done_i"
 QGC_FLAG_FILE_II="$CONFIG_FOLDER_PATH/.qgc_setup_done_ii"
 
 # Definitions to install QGC
@@ -12,6 +12,12 @@ DEST_DIR="/usr/local/bin"
 QGC_APP="$DEST_DIR/QGroundControl.AppImage"
 
 if [ ! -f "$QGC_FLAG_FILE_I" ]; then
+
+    echo ""
+    echo "======================================================================="
+    echo "  Starting the first part of the configuration for the harpia user..."           
+    echo "======================================================================="
+    echo ""
 
     # Remove modem manager
     sudo apt-get remove modemmanager -y && \
@@ -22,6 +28,15 @@ if [ ! -f "$QGC_FLAG_FILE_I" ]; then
     sudo apt install libxcb-xinerama0 libxkbcommon-x11-0 libxcb-cursor-dev -y && \
 
     if [ $? -eq 0 ]; then
+
+        echo ""
+        echo "======================================================================="
+        echo "  Preparing environment to install QGroundControl."           
+        echo "======================================================================="
+        echo ""
+        echo ">> You must restart the container."
+        echo ""
+
         # Create flag file
         touch "$QGC_FLAG_FILE_I"
 
@@ -29,7 +44,7 @@ if [ ! -f "$QGC_FLAG_FILE_I" ]; then
         exit 0 
     else
         echo ""
-        echo "Error when running configuration script for the third time."
+        echo "Error when installing QGroundControl."
         echo ">> Configuration aborted."
         echo ""
         
@@ -37,6 +52,12 @@ if [ ! -f "$QGC_FLAG_FILE_I" ]; then
         exit 1
     fi
 elif [ ! -f "$QGC_FLAG_FILE_II" ]; then
+
+    echo ""
+    echo "======================================================================="
+    echo "  Installing QGroundControl..."           
+    echo "======================================================================="
+    echo ""
 
     # Update packages and install dependencies
     sudo apt update && \
@@ -48,14 +69,30 @@ elif [ ! -f "$QGC_FLAG_FILE_II" ]; then
     sudo chmod +x "$QGC_APP"
 
     if [ $? -eq 0 ]; then
+        # Create an alias to open QGroundControl
+        echo " " >> /home/harpia/bashrc
+        echo "# Create an alias to open QGroundControl" >> /home/harpia/bashrc
+        echo 'alias qgc="su - harpia -c /usr/local/bin/QGroundControl.AppImage"' >> /home/harpia/.bashrc
+
+        # Allow harpia user to open display
+        echo " " >> /home/harpia/.bashrc
+        echo "# Allow harpia user to open display" >> /home/harpia/.bashrc
+        echo "export DISPLAY=:0" >> /home/harpia/.bashrc
+
         # Create flag file
-        touch "$QGC_FLAG_FILE_Ii"
+        touch "$QGC_FLAG_FILE_II"
+
+        echo ""
+        echo "======================================================================="
+        echo "  The environment is ready to use."           
+        echo "======================================================================="
+        echo ""
 
         # Exit the script returing a success code
         exit 0  
     else
         echo ""
-        echo "Error when running configuration script for the fourth time."
+        echo "Error when installing QGroundControl."
         echo ">> Configuration aborted."
         echo ""
             
@@ -63,7 +100,8 @@ elif [ ! -f "$QGC_FLAG_FILE_II" ]; then
     fi
 else
     echo ""
-    echo "Environment is already ready to use."
-            
+    echo ">> Environment is already ready to use."
+
+    # Exit the script returing a success code       
     exit 0
 fi
