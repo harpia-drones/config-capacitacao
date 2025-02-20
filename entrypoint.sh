@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # Path to config folder
-CONFIG_FOLDER_PATH="$HOME/config"
-DEPEND_FOLDER_PATH="$HOME/dependencies"
+CONFIG_FOLDER_PATH="/root/config"
+DEPEND_FOLDER_PATH="/root/dependencies"
+HARPIA_CONFIG_FOLDER_PATH="/home/harpia/config"
 
 # Path to a flag file indicating that the script has already run
 FLAG_FILE_I="$CONFIG_FOLDER_PATH/.setup_done_i"
@@ -19,7 +20,7 @@ if [ ! -f "$DEPEND_FOLDER_PATH" ]; then
     # Clone dependencies folder 
     echo ">> Cloning make dependencies folder..."
     echo ""
-    cd "$HOME" && \
+    cd "/root" && \
     git clone https://github.com/harpia-drones/dependencies.git && \
 
     if [ $? -eq 0 ]; then
@@ -32,41 +33,41 @@ if [ ! -f "$DEPEND_FOLDER_PATH" ]; then
         # Exit the script returing a failure code
         exit 1
     fi
-fi
+else
+    # Try to source the python virtual environment
+    source "/root/harpia_venv/bin/activate"
 
-# Try to source the python virtual environment
-source "/$HOME/harpia_venv/bin/activate"
+    if [ $? -eq 1 ]; then
 
-if [ $? -eq 1 ]; then
-
-    echo ""
-    echo "=================================================================="
-    echo "  Creating a python virtual environment before continuing           "
-    echo "=================================================================="
-    echo ""
-
-    # Update packages and install python3-venv pkg
-    apt-get update && \
-    apt-get install -y python3-venv && \
-
-    # Create the virtual environment in /$HOME
-    cd "/$HOME/" && \
-    python3 -m venv harpia_venv && \
-
-    # Activate the virtual environment
-    source "/$HOME/harpia_venv/bin/activate" && \
-
-    # Configure to activate venv everytime a new bash terminal is open
-    echo "source /$HOME/harpia_venv/bin/activate" >> "/$HOME/.bashrc"
-
-    # Validate the venv creation
-    if [ $? -eq 1 ]; then        
         echo ""
-        echo "Error when creating the virtual environment."
-        echo ">> Configuration aborted."
+        echo "=================================================================="
+        echo "  Creating a python virtual environment before continuing           "
+        echo "=================================================================="
+        echo ""
 
-        # Exit the script returing a failure code
-        exit 1
+        # Update packages and install python3-venv pkg
+        apt-get update && \
+        apt-get install -y python3-venv && \
+
+        # Create the virtual environment in //root
+        cd "/root" && \
+        python3 -m venv harpia_venv && \
+
+        # Activate the virtual environment
+        source "/root/harpia_venv/bin/activate" && \
+
+        # Configure to activate venv everytime a new bash terminal is open
+        echo "source /root/harpia_venv/bin/activate" >> "/root/.bashrc"
+
+        # Validate the venv creation
+        if [ $? -eq 1 ]; then        
+            echo ""
+            echo "Error when creating the virtual environment."
+            echo ">> Configuration aborted."
+
+            # Exit the script returing a failure code
+            exit 1
+        fi
     fi
 fi
 
@@ -84,7 +85,7 @@ if [ ! -f "$FLAG_FILE_I" ]; then
     apt-get upgrade -y
     
     # Install the PX4 development toolchain to use the simulator
-    cd "/$HOME/" && \
+    cd "/root" && \
     git clone https://github.com/PX4/PX4-Autopilot.git --recursive && \
     bash ./PX4-Autopilot/Tools/setup/ubuntu.sh 
     
@@ -128,7 +129,7 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
     apt-get install -y ros-dev-tools
 
     # Install XRCE-DDS Agent
-    cd "/$HOME/" && \
+    cd "/root/" && \
     git clone https://github.com/eProsima/Micro-XRCE-DDS-Agent.git && \
     cd Micro-XRCE-DDS-Agent && \
     mkdir build && \
@@ -150,7 +151,7 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
     cd "$WS_DIR_PATH" && \
     colcon build
 
-    # Create a password to $HOME
+    # Create a password to /root
     echo 'root:senha' | chpasswd
 
     # Create a new user named harpia
@@ -166,8 +167,15 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
     # Give permissions to harpia run sudo without password
     echo "harpia ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
 
+    # Create a config folde in /home/harpia
+    mkdir -p "$$HARPIA_CONFIG_FOLDER_PATH"
+
+    # Clone qgc_install.sh script
+    curl -L "https://raw.githubusercontent.com/harpia-drones/config/refs/heads/main/qgc_install.sh" -o "$HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh" && \
+    chmod a+rwx "$HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh" && \
+
     # Run qgc install script for the first time
-    su - harpia -c "bash $WS_DIR_PATH/src/dependencies/config/qgc_install.sh"
+    su - harpia -c "bash $HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh"
 
     # Verify if the last command return 0 (succesfully executed)
     if [ $? -eq 0 ]; then
@@ -202,7 +210,7 @@ elif [ ! -f "$FLAG_FILE_III" ]; then
     echo ""
 
     # Run qgc install script for the second time
-    su - harpia -c "bash $WS_DIR_PATH/src/dependencies/config/qgc_install.sh"
+    su - harpia -c "bash $HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh"
 
     # Verify if the last command return 0 (succesfully executed)
     if [ $? -eq 0 ]; then
@@ -212,8 +220,8 @@ elif [ ! -f "$FLAG_FILE_III" ]; then
         echo "export DISPLAY=:0" >> /home/harpia/.bashrc
 
         # Create an alias to open QGroundControl
-        echo "" >> "/$HOME/bashrc"
-        echo 'alias qgc=su - harpia -c "/usr/local/bin/QGroundControl.AppImage"' >> "/$HOME/.bashrc"
+        echo "" >> "/root/bashrc"
+        echo 'alias qgc=su - harpia -c "/usr/local/bin/QGroundControl.AppImage"' >> "/root/.bashrc"
 
         # Create the flag file
         touch "$FLAG_FILE_III"

@@ -1,18 +1,17 @@
 #!/bin/bash
 
-# Path to config folder
-CONFIG_FOLDER_PATH="/$HOME/config"
+CONFIG_FOLDER_PATH="$HOME/config"
 
 # Path to a flag file indicating that the script has already run
-FLAG_FILE_II="$CONFIG_FOLDER_PATH/.setup_done_ii"
-FLAG_FILE_III="$CONFIG_FOLDER_PATH/.setup_done_iii"
+QGC_FLAG_FILE_I="$CONFIG_FOLDER_PATH/.qgc_setup_done_ii"
+QGC_FLAG_FILE_II="$CONFIG_FOLDER_PATH/.qgc_setup_done_ii"
 
 # Definitions to install QGC
 QGC_URL="https://d176tv9ibo4jno.cloudfront.net/latest/QGroundControl.AppImage"
 DEST_DIR="/usr/local/bin"
 QGC_APP="$DEST_DIR/QGroundControl.AppImage"
 
-if [ ! -f "$FLAG_FILE_II" ]; then
+if [ ! -f "$QGC_FLAG_FILE_I" ]; then
 
     # Remove modem manager
     sudo apt-get remove modemmanager -y && \
@@ -23,6 +22,9 @@ if [ ! -f "$FLAG_FILE_II" ]; then
     sudo apt install libxcb-xinerama0 libxkbcommon-x11-0 libxcb-cursor-dev -y && \
 
     if [ $? -eq 0 ]; then
+        # Create flag file
+        touch "$QGC_FLAG_FILE_I"
+
         # Exit the script returing a success code
         exit 0 
     else
@@ -34,7 +36,7 @@ if [ ! -f "$FLAG_FILE_II" ]; then
         # Exit the script returing a failure code
         exit 1
     fi
-elif [ ! -f "$FLAG_FILE_III" ]; then
+elif [ ! -f "$QGC_FLAG_FILE_II" ]; then
 
     # Update packages and install dependencies
     sudo apt update && \
@@ -46,6 +48,10 @@ elif [ ! -f "$FLAG_FILE_III" ]; then
     sudo chmod +x "$QGC_APP"
 
     if [ $? -eq 0 ]; then
+        # Create flag file
+        touch "$QGC_FLAG_FILE_Ii"
+
+        # Exit the script returing a success code
         exit 0  
     else
         echo ""
