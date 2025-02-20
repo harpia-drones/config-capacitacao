@@ -39,41 +39,44 @@ if [ ! -f "$DEP_FLAG_FILE" ]; then
         exit 1
     fi
 else
-    # Try to source the python virtual environment
-    source "/root/harpia_venv/bin/activate"
+    echo ""
+    echo ">> Requirement satisfied: Make dependencies."
+fi
+    
+# Try to source the python virtual environment
+source "/root/harpia_venv/bin/activate"
 
-    if [ $? -eq 1 ]; then
+if [ $? -eq 1 ]; then
 
+    echo ">> Creating a python virtual environment..."
+    echo ""
+
+    # Update packages and install python3-venv pkg
+    apt-get update && \
+    apt-get install -y python3-venv && \
+
+    # Create the virtual environment in //root
+    cd "/root" && \
+    python3 -m venv harpia_venv && \
+
+    # Activate the virtual environment
+    source "/root/harpia_venv/bin/activate" && \
+
+    # Configure to activate venv everytime a new bash terminal is open
+    echo "source /root/harpia_venv/bin/activate" >> "/root/.bashrc"
+
+    # Validate the venv creation
+    if [ $? -eq 1 ]; then        
         echo ""
-        echo "=================================================================="
-        echo "  Creating a python virtual environment before continuing           "
-        echo "=================================================================="
-        echo ""
+        echo "Error when creating the virtual environment."
+        echo ">> Configuration aborted."
 
-        # Update packages and install python3-venv pkg
-        apt-get update && \
-        apt-get install -y python3-venv && \
-
-        # Create the virtual environment in //root
-        cd "/root" && \
-        python3 -m venv harpia_venv && \
-
-        # Activate the virtual environment
-        source "/root/harpia_venv/bin/activate" && \
-
-        # Configure to activate venv everytime a new bash terminal is open
-        echo "source /root/harpia_venv/bin/activate" >> "/root/.bashrc"
-
-        # Validate the venv creation
-        if [ $? -eq 1 ]; then        
-            echo ""
-            echo "Error when creating the virtual environment."
-            echo ">> Configuration aborted."
-
-            # Exit the script returing a failure code
-            exit 1
-        fi
+        # Exit the script returing a failure code
+        exit 1
     fi
+else
+    echo ""
+    echo ">> Requirement satisfied: Virtual environment sourced."
 fi
 
 # If the flag file does not exist, run the script and create the flag
