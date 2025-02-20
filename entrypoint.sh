@@ -17,10 +17,10 @@ echo "Checking pre-requirements..."
 if [ ! -f "$DEPEND_FOLDER_PATH" ]; then
 
     # Clone dependencies folder 
-    echo ">> Cloning make dependencies folder..."]
+    echo ">> Cloning make dependencies folder..."
     echo ""
     cd "$HOME" && \
-    git clone git@github.com:harpia-drones/dependencies.git && \
+    git clone https://github.com/harpia-drones/dependencies.git && \
 
     if [ $? -eq 0 ]; then
         mv "$DEPEND_FOLDER_PATH/Makefile" "$WS_DIR_PATH/src/"
@@ -148,10 +148,10 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
 
     # Build the environment
     cd "$WS_DIR_PATH" && \
-    colcon build --packages-ignore bringup description interfaces
+    colcon build
 
     # Create a password to $HOME
-    echo '$HOME:senha' | chpasswd
+    echo 'root:senha' | chpasswd
 
     # Create a new user named harpia
     useradd -m -s /bin/bash harpia && \
