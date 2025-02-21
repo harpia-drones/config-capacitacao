@@ -21,6 +21,24 @@ echo "Checking pre-requirements..."
 
 if [ ! -f "$DEP_FLAG_FILE" ]; then
 
+    # Tmux configuration
+    touch /root/.tmux.conf && \
+    echo 'set -g mouse on' >> /root/.tmux.conf && \
+    echo 'bind -n C-Left select-pane -L' >> /root/.tmux.conf && \
+    echo 'bind -n C-Right select-pane -R' >> /root/.tmux.conf && \
+    echo 'bind -n C-Up select-pane -U' >> /root/.tmux.conf && \
+    echo 'bind -n C-Down select-pane -D' >> /root/.tmux.conf && \
+    echo 'setw -g mode-keys vi' >> /root/.tmux.conf
+
+    # Install some ros2 packages
+    apt-get update && \
+    apt-get install -y ros-jazzy-joint-state-publisher-gui
+
+    # Create an alias to source the terminal
+    echo " " >> /root/.bashrc
+    echo "# Alias to source the terminal" >> /root/.bashrc
+    echo "alias bashrc='source /root/.bashrc'" >> /root/.bashrc
+
     # Clone dependencies folder 
     echo ">> Cloning make dependencies folder..."
     echo ""
@@ -62,7 +80,7 @@ if [ $? -eq 1 ]; then
     source "/root/harpia_venv/bin/activate" && \
 
     # Configure to activate venv everytime a new bash terminal is open
-    echo "source /root/harpia_venv/bin/activate" >> "/root/.bashrc"
+    echo "source /root/harpia_venv/bin/activate" >> /root/.bashrc
 
     # Validate the venv creation
     if [ $? -eq 1 ]; then        
@@ -156,7 +174,7 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
 
     # Build the environment
     cd "$WS_DIR_PATH" && \
-    colcon build
+    colcon build --packages-ignore bringup description interfaces
 
     # Create a password to /root
     echo 'root:senha' | chpasswd

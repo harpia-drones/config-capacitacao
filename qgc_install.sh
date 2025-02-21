@@ -38,7 +38,7 @@ if [ ! -f "$QGC_FLAG_FILE_I" ]; then
         echo ""
 
         # Create flag file
-        touch "$QGC_FLAG_FILE_I"
+        sudo touch "$QGC_FLAG_FILE_I"
 
         # Exit the script returing a success code
         exit 0 
@@ -69,18 +69,32 @@ elif [ ! -f "$QGC_FLAG_FILE_II" ]; then
     sudo chmod +x "$QGC_APP"
 
     if [ $? -eq 0 ]; then
-        # Create an alias to open QGroundControl
-        echo " " >> /home/harpia/bashrc
-        echo "# Create an alias to open QGroundControl" >> /home/harpia/bashrc
-        echo 'alias qgc="su - harpia -c /usr/local/bin/QGroundControl.AppImage"' >> /home/harpia/.bashrc
 
         # Allow harpia user to open display
         echo " " >> /home/harpia/.bashrc
         echo "# Allow harpia user to open display" >> /home/harpia/.bashrc
         echo "export DISPLAY=:0" >> /home/harpia/.bashrc
 
+        # Create an alias to open QGroundControl
+        echo " " >> /home/harpia/bashrc
+        echo "# Create an alias to open QGroundControl" >> /home/harpia/bashrc
+        echo "/usr/local/bin/QGroundControl.AppImag" >> /home/harpia/.bashrc
+
+        # Create an alias to source the terminal
+        echo " " >> /home/harpia/bashrc
+        echo "# Create an alias to source the terminal" >> /home/harpia/bashrc
+        echo "source /home/harpia/.bashrc" >> /home/harpia/.bashrc
+
+        # Termianal personalization
+        curl -s https://ohmyposh.dev/install.sh | bash -s && \
+        mkdir /home/harpia/.poshthemes && \
+        curl -L "https://raw.githubusercontent.com/harpia-drones/Tema/refs/heads/main/theme.json" -o /home/harpia/.poshthemes/theme.json &&\
+        chmod u+rw /home/harpia/.poshthemes/theme.json && \
+        echo 'eval "$(oh-my-posh init bash --config /home/harpia/.poshthemes/theme.json)"' >> /home/harpia/.bashrc && \
+        echo "69" | bash -c "$(curl -sSL https://git.io/vQgMr)" && \
+
         # Create flag file
-        touch "$QGC_FLAG_FILE_II"
+        sudo touch "$QGC_FLAG_FILE_II"
 
         echo ""
         echo "======================================================================="
