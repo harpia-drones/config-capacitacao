@@ -15,7 +15,7 @@ if [ ! -f "$QGC_FLAG_FILE_I" ]; then
 
     echo ""
     echo "======================================================================="
-    echo "  Starting the first part of the configuration for the harpia user..."           
+    echo "  Preparing environment to install QGroundControl."           
     echo "======================================================================="
     echo ""
 
@@ -23,15 +23,15 @@ if [ ! -f "$QGC_FLAG_FILE_I" ]; then
     sudo apt-get remove modemmanager -y && \
 
     # install GStreamer
-    sudo apt install gstreamer1.0-plugins-bad gstreamer1.0-libav gstreamer1.0-gl -y && \
-    sudo apt install libfuse2 -y && \
-    sudo apt install libxcb-xinerama0 libxkbcommon-x11-0 libxcb-cursor-dev -y && \
+    sudo apt-get install gstreamer1.0-plugins-bad gstreamer1.0-libav gstreamer1.0-gl -y && \
+    sudo apt-get install libfuse2 -y && \
+    sudo apt-get install libxcb-xinerama0 libxkbcommon-x11-0 libxcb-cursor-dev -y && \
 
     if [ $? -eq 0 ]; then
 
         echo ""
         echo "======================================================================="
-        echo "  Preparing environment to install QGroundControl."           
+        echo "  Restart the container to validade changes."           
         echo "======================================================================="
         echo ""
         echo ">> You must restart the container."
