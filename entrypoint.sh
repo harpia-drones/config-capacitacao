@@ -18,47 +18,6 @@ FLAG_FILE_II="$CONFIG_FOLDER_PATH/.setup_done_ii"
 WS_DIR_PATH=$(find "$HOME" -type d -name "*_ws" -print -quit)
 
 echo "Checking pre-requirements..."
-
-if [ ! -f "$DEP_FLAG_FILE" ]; then
-
-    # Tmux configuration
-    touch /root/.tmux.conf && \
-    echo 'set -g mouse on' >> /root/.tmux.conf && \
-    echo 'bind -n C-Left select-pane -L' >> /root/.tmux.conf && \
-    echo 'bind -n C-Right select-pane -R' >> /root/.tmux.conf && \
-    echo 'bind -n C-Up select-pane -U' >> /root/.tmux.conf && \
-    echo 'bind -n C-Down select-pane -D' >> /root/.tmux.conf && \
-    echo 'setw -g mode-keys vi' >> /root/.tmux.conf
-
-    # Install some ros2 packages
-    apt-get update && \
-    apt-get install -y ros-jazzy-joint-state-publisher-gui
-
-    # Create an alias to source the terminal
-    echo " " >> /root/.bashrc
-    echo "# Alias to source the terminal" >> /root/.bashrc
-    echo "alias bashrc='source /root/.bashrc'" >> /root/.bashrc
-
-    # Clone dependencies folder 
-    echo ">> Cloning make dependencies folder..."
-    echo ""
-    cd "/root" && \
-    git clone https://github.com/harpia-drones/dependencies.git && \
-
-    if [ $? -eq 0 ]; then
-        mv "$DEPEND_FOLDER_PATH/Makefile" "$WS_DIR_PATH/src/"
-    else
-        echo ""
-        echo "Error when cloning make dependencies folder."
-        echo ">> Configuration aborted."
-
-        # Exit the script returing a failure code
-        exit 1
-    fi
-else
-    echo ""
-    echo ">> Requirement satisfied: Make dependencies."
-fi
     
 # Try to source the python virtual environment
 source "/root/harpia_venv/bin/activate"
