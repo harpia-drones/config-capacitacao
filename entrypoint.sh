@@ -70,8 +70,8 @@ if [ ! -f "$FLAG_FILE_I" ]; then
     
     # Install the PX4 development toolchain to use the simulator
     cd "/root" && \
-    git clone https://github.com/PX4/PX4-Autopilot.git --recursive && \
-    bash ./PX4-Autopilot/Tools/setup/ubuntu.sh 
+    git clone git@github.com:PX4/PX4-Autopilot.git --recursive && \
+    bash /root/PX4-Autopilot/Tools/setup/ubuntu.sh 
     
     # Verify if the last command return 0 (succesfully executed)
     if [ $? -eq 0 ]; then
@@ -114,7 +114,7 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
 
     # Install XRCE-DDS Agent
     cd "/root/" && \
-    git clone https://github.com/eProsima/Micro-XRCE-DDS-Agent.git && \
+    git clone git@github.com:eProsima/Micro-XRCE-DDS-Agent.git && \
     cd Micro-XRCE-DDS-Agent && \
     mkdir build && \
     cd build && \
@@ -125,8 +125,8 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
 
     # Clone dependency packages for PX4
     cd "$WS_DIR_PATH/src" && \
-    git clone https://github.com/PX4/px4_msgs.git && \
-    git clone https://github.com/PX4/px4_ros_com.git && \
+    git clone git@github.com:PX4/px4_msgs.git && \
+    git clone git@github.com:PX4/px4_ros_com.git && \
 
     # Build the environment
     cd "$WS_DIR_PATH" && \
@@ -163,6 +163,11 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
     echo " " >> /home/harpia/.bashrc && \
     echo "# Create an alias to install QGroundControl" >> /home/harpia/.bashrc && \
     echo "alias setup='bash $HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh'" >> /home/harpia/.bashrc && \
+
+    # Create an alias to start qgc
+    echo " " >> /root/.bashrc && \
+    echo "# Create an alias to start QGroundControl" >> /root/.bashrc && \
+    echo "alias qgc=\"runuser -l harpia -c 'DISPLAY=:0 /usr/local/bin/QGroundControl.AppImage'\"" >> /root/.bashrc && \
 
     # Verify if the last command return 0 (succesfully executed)
     if [ $? -eq 0 ]; then

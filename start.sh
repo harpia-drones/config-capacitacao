@@ -46,7 +46,7 @@ if [ ! -f "$DEP_FLAG_FILE" ]; then
     echo ">> Cloning make dependencies folder..."
     echo " "
     cd "/root" && \
-    git clone https://github.com/harpia-drones/dependencies.git && \
+    git clone git@github.com:harpia-drones/dependencies.git && \
 
     if [ $? -eq 0 ]; then
         echo ""
