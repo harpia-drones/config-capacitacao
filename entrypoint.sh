@@ -4,6 +4,14 @@
 CONFIG_FOLDER_PATH="/root/config"
 HARPIA_CONFIG_FOLDER_PATH="/home/harpia/config"
 
+QGC_FLAG_FILE_I="home/harpia/.qgc_setup_done_i"
+QGC_FLAG_FILE_II="home/harpia/.qgc_setup_done_ii"
+
+# Definitions to install QGC
+QGC_URL="https://d176tv9ibo4jno.cloudfront.net/latest/QGroundControl.AppImage"
+DEST_DIR="/usr/local/bin"
+QGC_APP="$DEST_DIR/QGroundControl.AppImage"
+
 # Path to dependencies folder
 DEPEND_FOLDER_PATH="/root/dependencies"
 
@@ -125,8 +133,7 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
 
     # Clone dependency packages for PX4
     cd "$WS_DIR_PATH/src" && \
-    git clone git@github.com:PX4/px4_msgs.git && \
-    git clone git@github.com:PX4/px4_ros_com.git && \
+    git clone git@github.com:PX4/px4_msgs.git
 
     # Build the environment
     cd "$WS_DIR_PATH" && \
@@ -159,12 +166,12 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
     curl -L "https://raw.githubusercontent.com/harpia-drones/config/refs/heads/main/qgc_install.sh" -o "$HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh" && \
     chmod a+rwx "$HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh" && \
     
-    # Create an alias to install qgc
+    # Create an alias to install qgc with harpia
     echo " " >> /home/harpia/.bashrc && \
     echo "# Create an alias to install QGroundControl" >> /home/harpia/.bashrc && \
     echo "alias setup='bash $HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh'" >> /home/harpia/.bashrc && \
 
-    # Create an alias to start qgc
+    # Create an alias to start qgc with root
     echo " " >> /root/.bashrc && \
     echo "# Create an alias to start QGroundControl" >> /root/.bashrc && \
     echo "alias qgc=\"runuser -l harpia -c 'DISPLAY=:0 /usr/local/bin/QGroundControl.AppImage'\"" >> /root/.bashrc && \
@@ -191,11 +198,38 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
         # Exit the script returing a failure code
         exit 1
     fi
+elif if [ ! -f "$QGC_FLAG_FILE_I" ]; then
+
+    # Run setup bash script
+    runuser -l harpia -c "source /home/harpia/.bashrc && setup"
+
+    if [ $? -eq 0 ]; then
+        # Exit the script returing a success code
+        exit 0 
+    else
+        # Exit the script returing a failure code
+        exit 1
+    fi
+elif [ ! -f "$QGC_FLAG_FILE_II" ]; then
+
+    # Run setup bash script
+    runuser -l harpia -c "source /home/harpia/.bashrc && setup"
+
+    # Give the required permissions to harpia user
+    chmod -R a+xrw /home/harpia/
+    chmod 600 /root/.ssh/id_ed25519
+
+    if [ $? -eq 0 ]; then
+        # Exit the script returing a success code
+        exit 0  
+    else
+        # Exit the script returing a failure code
+        exit 1
+    fi
 else
     echo ""
-    echo "All the configurations for root is done. Check configurations for harpia."
-    echo ""
+    echo ">> Environment is already ready to use."
 
-    # Exit the script returing a success code
+    # Exit the script returing a success code       
     exit 0
 fi

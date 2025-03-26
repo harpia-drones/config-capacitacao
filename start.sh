@@ -30,6 +30,11 @@ if [ ! -f "$DEP_FLAG_FILE" ]; then
     echo "# Alias to source the terminal" >> /root/.bashrc
     echo "alias bashrc='source /root/.bashrc'" >> /root/.bashrc
 
+    # Create an alias to build ros2 workspace
+    echo " " >> /root/.bashrc
+    echo "# Alias to build ros2 workspace" >> /root/.bashrc
+    echo "alias cb='colcon build && source /root/.bashrc'" >> /root/.bashrc
+
     # Create config folder
     mkdir -p /root/config
 
