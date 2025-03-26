@@ -53,7 +53,7 @@ if [ ! -f "$DEP_FLAG_FILE" ]; then
     cd "/root" && \
     git clone git@github.com:harpia-drones/dependencies.git && \
 
-    if [ $? -eq 0 ]; then
+    if [ $? -eq 1 ]; then
         echo ""
         echo "Error when cloning make dependencies folder."
         echo ">> Configuration aborted."
