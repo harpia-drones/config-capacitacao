@@ -4,8 +4,8 @@
 CONFIG_FOLDER_PATH="/root/config"
 HARPIA_CONFIG_FOLDER_PATH="/home/harpia/config"
 
-QGC_FLAG_FILE_I="home/harpia/.qgc_setup_done_i"
-QGC_FLAG_FILE_II="home/harpia/.qgc_setup_done_ii"
+QGC_FLAG_FILE_I="/home/harpia/.qgc_setup_done_i"
+QGC_FLAG_FILE_II="/home/harpia/.qgc_setup_done_ii"
 
 # Definitions to install QGC
 QGC_URL="https://d176tv9ibo4jno.cloudfront.net/latest/QGroundControl.AppImage"
@@ -26,12 +26,9 @@ FLAG_FILE_II="$CONFIG_FOLDER_PATH/.setup_done_ii"
 WS_DIR_PATH=$(find "$HOME" -type d -name "*_ws" -print -quit)
 
 echo "Checking pre-requirements..."
-    
+
 # Try to source the python virtual environment
-source "/root/harpia_venv/bin/activate"
-
-if [ $? -eq 1 ]; then
-
+if [ ! -f "/root/harpia_venv/bin/activate" ]; then
     echo ">> Creating a python virtual environment..."
     echo ""
 
@@ -39,33 +36,29 @@ if [ $? -eq 1 ]; then
     apt-get update && \
     apt-get install -y python3-venv && \
 
-    # Create the virtual environment in //root
+    # Create the virtual environment in /root
     cd "/root" && \
     python3 -m venv harpia_venv && \
-
-    # Activate the virtual environment
-    source "/root/harpia_venv/bin/activate" && \
 
     # Configure to activate venv everytime a new bash terminal is open
     echo "source /root/harpia_venv/bin/activate" >> /root/.bashrc
 
-    # Validate the venv creation
-    if [ $? -eq 1 ]; then        
+    if [ $? -ne 0 ]; then        
         echo ""
         echo "Error when creating the virtual environment."
         echo ">> Configuration aborted."
-
-        # Exit the script returing a failure code
         exit 1
     fi
 else
     echo ""
-    echo ">> Requirement satisfied: Virtual environment sourced."
+    echo ">> Requirement satisfied: Virtual environment exists."
 fi
 
-# If the flag file does not exist, run the script and create the flag
-if [ ! -f "$FLAG_FILE_I" ]; then
+# Source the venv regardless
+source "/root/harpia_venv/bin/activate"
 
+# First configuration stage
+if [ ! -f "$FLAG_FILE_I" ]; then
     echo ""
     echo "=================================================================="
     echo "  Starting the first part of configuration..."
@@ -76,44 +69,37 @@ if [ ! -f "$FLAG_FILE_I" ]; then
     apt-get update && \
     apt-get upgrade -y
     
-    # Install the PX4 development toolchain to use the simulator
+    # Install the PX4 development toolchain
     cd "/root" && \
-    git clone git@github.com:PX4/PX4-Autopilot.git --recursive && \
+    git clone https://github.com/PX4/PX4-Autopilot.git --recursive && \
     bash /root/PX4-Autopilot/Tools/setup/ubuntu.sh 
     
-    # Verify if the last command return 0 (succesfully executed)
     if [ $? -eq 0 ]; then
-
-    	# Create the flag file
         touch "$FLAG_FILE_I"
-        
         echo ""
         echo "=================================================================="
-    	echo "  First part of cofiguration completed successfully!"        
-    	echo "=================================================================="
+        echo "  First part of configuration completed successfully!"        
+        echo "=================================================================="
         echo ""
         echo ">> You must restart the container."
         echo ""
-
-        # Exit the script returning a success code
         exit 0
     else
         echo ""
         echo "Error when running configuration script for the first time."
         echo ">> Configuration aborted."
-
-        # Exit the script returing a failure code
         exit 1
     fi
-elif [ ! -f "$FLAG_FILE_II" ]; then
 
+# Second configuration stage
+elif [ ! -f "$FLAG_FILE_II" ]; then
     echo ""
     echo "=================================================================="
     echo "  Starting the second part of configuration..."           
     echo "=================================================================="
     echo ""
 
-    # Install some dependencies for ros2
+    # Install dependencies
     pip install -U "empy==3.3.4" pyros-genmsg setuptools catkin_pkg lark
     apt-get update
     apt-get install -y python3-colcon-common-extensions
@@ -122,7 +108,7 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
 
     # Install XRCE-DDS Agent
     cd "/root/" && \
-    git clone git@github.com:eProsima/Micro-XRCE-DDS-Agent.git && \
+    git clone https://github.com/eProsima/Micro-XRCE-DDS-Agent.git && \
     cd Micro-XRCE-DDS-Agent && \
     mkdir build && \
     cd build && \
@@ -131,105 +117,58 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
     make install && \
     ldconfig /usr/local/lib/
 
-    # Clone dependency packages for PX4
+    # Clone px4_msgs
+    mkdir -p "$WS_DIR_PATH/src"
     cd "$WS_DIR_PATH/src" && \
-    git clone git@github.com:PX4/px4_msgs.git
+    git clone https://github.com/PX4/px4_msgs.git
 
     # Build the environment
     cd "$WS_DIR_PATH" && \
     colcon build --packages-ignore bringup description interfaces
 
-    # Create a password to /root
+    # User configuration
     echo 'root:senha' | chpasswd
-
-    # Create a new user named harpia
-    useradd -m -s /bin/bash harpia && \
-
-    # Create a password to harpia
-    echo 'harpia:senha' | chpasswd && \
-
-    # Add harpia to usdo and dialout groups
-    usermod -aG sudo harpia && \
-    usermod -aG dialout harpia && \
-
-    # Give permissions to harpia run sudo without password
-    echo "harpia ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
-
-    # Allow display to harpia
-    echo "" >> /home/harpia/.bashrc
+    useradd -m -s /bin/bash harpia
+    echo 'harpia:senha' | chpasswd
+    usermod -aG sudo harpia
+    usermod -aG dialout harpia
+    echo "harpia ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
     echo "export DISPLAY=:0" >> /home/harpia/.bashrc
 
-    # Create a config folde in /home/harpia
-    mkdir -p "$HARPIA_CONFIG_FOLDER_PATH" && \
+    # QGC setup preparation
+    mkdir -p "$HARPIA_CONFIG_FOLDER_PATH"
+    curl -L "https://raw.githubusercontent.com/harpia-drones/config/main/qgc_install.sh" -o "$HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh"
+    chmod a+rwx "$HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh"
+    echo "alias setup='bash $HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh'" >> /home/harpia/.bashrc
+    echo "alias qgc=\"runuser -l harpia -c 'DISPLAY=:0 /usr/local/bin/QGroundControl.AppImage'\"" >> /root/.bashrc
 
-    # Clone qgc_install.sh script
-    curl -L "https://raw.githubusercontent.com/harpia-drones/config/refs/heads/main/qgc_install.sh" -o "$HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh" && \
-    chmod a+rwx "$HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh" && \
-    
-    # Create an alias to install qgc with harpia
-    echo " " >> /home/harpia/.bashrc && \
-    echo "# Create an alias to install QGroundControl" >> /home/harpia/.bashrc && \
-    echo "alias setup='bash $HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh'" >> /home/harpia/.bashrc && \
-
-    # Create an alias to start qgc with root
-    echo " " >> /root/.bashrc && \
-    echo "# Create an alias to start QGroundControl" >> /root/.bashrc && \
-    echo "alias qgc=\"runuser -l harpia -c 'DISPLAY=:0 /usr/local/bin/QGroundControl.AppImage'\"" >> /root/.bashrc && \
-
-    # Verify if the last command return 0 (succesfully executed)
     if [ $? -eq 0 ]; then
-
-        # Create the flag file
         touch "$FLAG_FILE_II"
-            
         echo ""
         echo "=================================================================="
-        echo "  Second part of cofiguration completed successfully!"               
+        echo "  Second part of configuration completed successfully!"               
         echo "=================================================================="
         echo ""
-
-        # Exit the script returing a failure code
         exit 0
     else
         echo ""
-        echo "Error when running configuration script for the sencond time."
+        echo "Error when running configuration script for the second time."
         echo ">> Configuration aborted."
-
-        # Exit the script returing a failure code
         exit 1
     fi
-elif if [ ! -f "$QGC_FLAG_FILE_I" ]; then
+fi
 
-    # Run setup bash script
+# QGC installation checks (separate from main configuration)
+if [ ! -f "$QGC_FLAG_FILE_I" ]; then
     runuser -l harpia -c "source /home/harpia/.bashrc && setup"
-
-    if [ $? -eq 0 ]; then
-        # Exit the script returing a success code
-        exit 0 
-    else
-        # Exit the script returing a failure code
-        exit 1
-    fi
+    exit $?
 elif [ ! -f "$QGC_FLAG_FILE_II" ]; then
-
-    # Run setup bash script
     runuser -l harpia -c "source /home/harpia/.bashrc && setup"
-
-    # Give the required permissions to harpia user
     chmod -R a+xrw /home/harpia/
     chmod 600 /root/.ssh/id_ed25519
-
-    if [ $? -eq 0 ]; then
-        # Exit the script returing a success code
-        exit 0  
-    else
-        # Exit the script returing a failure code
-        exit 1
-    fi
+    exit $?
 else
     echo ""
-    echo ">> Environment is already ready to use."
-
-    # Exit the script returing a success code       
+    echo ">> Environment is already ready to use."       
     exit 0
 fi
