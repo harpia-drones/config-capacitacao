@@ -160,12 +160,12 @@ fi
 
 # QGC installation checks (separate from main configuration)
 if [ ! -f "$QGC_FLAG_FILE_I" ]; then
-    runuser -l harpia -c "source /home/harpia/.bashrc && setup"
+    runuser -l harpia -c "source /home/harpia/.bashrc && bash $HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh"
     exit $?
 elif [ ! -f "$QGC_FLAG_FILE_II" ]; then
-    runuser -l harpia -c "source /home/harpia/.bashrc && setup"
-    chmod -R a+xrw /home/harpia/
-    chmod 600 /root/.ssh/id_ed25519
+    runuser -l harpia -c "source /home/harpia/.bashrc && bash $HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh"
+    cd /home && chmod a+x harpia && \
+    chmod 600 /root/.ssh
     exit $?
 else
     echo ""
