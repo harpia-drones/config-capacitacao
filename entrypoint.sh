@@ -71,8 +71,11 @@ if [ ! -f "$FLAG_FILE_I" ]; then
     
     # Install the PX4 development toolchain
     cd "/root" && \
-    git clone https://github.com/PX4/PX4-Autopilot.git --recursive && \
+    git clone git@github.com:PX4/PX4-Autopilot.git --recursive && \
     bash /root/PX4-Autopilot/Tools/setup/ubuntu.sh 
+
+    # Import the custom eletroquad world 
+    bash /root/config/eletroquad_world.sh
     
     if [ $? -eq 0 ]; then
         touch "$FLAG_FILE_I"
@@ -108,7 +111,7 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
 
     # Install XRCE-DDS Agent
     cd "/root/" && \
-    git clone https://github.com/eProsima/Micro-XRCE-DDS-Agent.git && \
+    git clone git@github.com:eProsima/Micro-XRCE-DDS-Agent.git && \
     cd Micro-XRCE-DDS-Agent && \
     mkdir build && \
     cd build && \
@@ -117,10 +120,15 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
     make install && \
     ldconfig /usr/local/lib/
 
-    # Clone px4_msgs
+    # Clone packages
     mkdir -p "$WS_DIR_PATH/src"
-    cd "$WS_DIR_PATH/src" && \
-    git clone https://github.com/PX4/px4_msgs.git
+    cd "$WS_DIR_PATH/src"
+    git clone git@github.com:PX4/px4_msgs.git
+    git clone git@github.com:harpia-drones/offboard_control.git
+    git clone git@github.com:harpia-drones/offboard_control_bringup.git
+
+    # Import the drone model into px4 (adapt existing model)
+    bash /root/config/eletroquad_model.sh
 
     # Build the environment
     cd "$WS_DIR_PATH" && \

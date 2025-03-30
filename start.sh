@@ -42,6 +42,14 @@ if [ ! -f "$DEP_FLAG_FILE" ]; then
     curl -L "https://raw.githubusercontent.com/harpia-drones/config/refs/heads/main/entrypoint.sh" -o /root/config/entrypoint.sh && \
     chmod +x /root/config/entrypoint.sh
 
+    # Clone the eletroquad_world.sh
+    curl -L "https://raw.githubusercontent.com/harpia-drones/config/refs/heads/main/eletroquad_world.sh" -o /root/config/eletroquad_world.sh && \
+    chmod +x /root/config/eletroquad_world.sh
+
+    # Clone the eletroquad_model.sh
+    curl -L "https://raw.githubusercontent.com/harpia-drones/config/refs/heads/main/eletroquad_model.sh" -o /root/config/eletroquad_model.sh && \
+    chmod +x /root/config/eletroquad_model.sh
+
     # Create an alias to setup
     echo " " >> /root/.bashrc
     echo "# Create an alias to setup" >> /root/.bashrc
