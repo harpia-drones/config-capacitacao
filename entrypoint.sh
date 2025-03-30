@@ -61,7 +61,7 @@ source "/root/harpia_venv/bin/activate"
 if [ ! -f "$FLAG_FILE_I" ]; then
     echo ""
     echo "=================================================================="
-    echo "  Starting the first part of configuration..."
+    echo "  Installing PX4-Autopilot..."
     echo "=================================================================="
     echo ""
     
@@ -78,7 +78,7 @@ if [ ! -f "$FLAG_FILE_I" ]; then
         touch "$FLAG_FILE_I"
         echo ""
         echo "=================================================================="
-        echo "  First part of configuration completed successfully!"        
+        echo "  PX4-Autopilot installed successfully!"        
         echo "=================================================================="
         echo ""
         echo ">> You must restart the container."
@@ -95,7 +95,7 @@ if [ ! -f "$FLAG_FILE_I" ]; then
 elif [ ! -f "$FLAG_FILE_II" ]; then
     echo ""
     echo "=================================================================="
-    echo "  Starting the second part of configuration..."           
+    echo "  Installing Micro-XRCE..."           
     echo "=================================================================="
     echo ""
 
@@ -128,12 +128,16 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
 
     # User configuration
     echo 'root:senha' | chpasswd
+
+    # Create a new user named harpia
     useradd -m -s /bin/bash harpia
     echo 'harpia:senha' | chpasswd
     usermod -aG sudo harpia
     usermod -aG dialout harpia
     echo "harpia ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
     echo "export DISPLAY=:0" >> /home/harpia/.bashrc
+    cp -r /root/.ssh /home/harpia
+    sudo chown -R harpia:harpia /home/harpia/.ssh
 
     # QGC setup preparation
     mkdir -p "$HARPIA_CONFIG_FOLDER_PATH"
@@ -146,7 +150,7 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
         touch "$FLAG_FILE_II"
         echo ""
         echo "=================================================================="
-        echo "  Second part of configuration completed successfully!"               
+        echo "  Micro-XRCE installed successfully!"               
         echo "=================================================================="
         echo ""
         exit 0
@@ -160,12 +164,12 @@ fi
 
 # QGC installation checks (separate from main configuration)
 if [ ! -f "$QGC_FLAG_FILE_I" ]; then
-    runuser -l harpia -c "source /home/harpia/.bashrc && bash $HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh"
+    runuser -l harpia -c "source /home/harpia/.bashrc && \
+                          bash $HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh"
     exit $?
 elif [ ! -f "$QGC_FLAG_FILE_II" ]; then
-    runuser -l harpia -c "source /home/harpia/.bashrc && bash $HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh"
-    cd /home && chmod a+x harpia && \
-    chmod 600 /root/.ssh
+    runuser -l harpia -c "source /home/harpia/.bashrc && \
+                          bash $HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh"
     exit $?
 else
     echo ""

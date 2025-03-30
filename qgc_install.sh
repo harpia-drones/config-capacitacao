@@ -31,7 +31,7 @@ if [ ! -f "$QGC_FLAG_FILE_I" ]; then
 
         echo ""
         echo "======================================================================="
-        echo "  Restart the container to validade changes."           
+        echo "  Process done."           
         echo "======================================================================="
         echo ""
         echo ">> You must restart the container."
@@ -44,7 +44,7 @@ if [ ! -f "$QGC_FLAG_FILE_I" ]; then
         exit 0 
     else
         echo ""
-        echo "Error when installing QGroundControl."
+        echo "Error when preparing environment to install QGroundControl."
         echo ">> Configuration aborted."
         echo ""
         
