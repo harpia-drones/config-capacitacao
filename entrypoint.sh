@@ -25,10 +25,12 @@ FLAG_FILE_II="$CONFIG_FOLDER_PATH/.setup_done_ii"
 # Path to ros2 workspace
 WS_DIR_PATH=$(find "$HOME" -type d -name "*_ws" -print -quit)
 
+echo ""
 echo "Checking pre-requirements..."
 
 # Try to source the python virtual environment
 if [ ! -f "/root/harpia_venv/bin/activate" ]; then
+    echo ""
     echo ">> Creating a python virtual environment..."
     echo ""
 
@@ -52,6 +54,7 @@ if [ ! -f "/root/harpia_venv/bin/activate" ]; then
 else
     echo ""
     echo ">> Requirement satisfied: Virtual environment exists."
+    echo ""
 fi
 
 # Source the venv regardless
@@ -161,20 +164,19 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
         echo "  Micro-XRCE installed successfully!"               
         echo "=================================================================="
         echo ""
-        exit 0
     else
         echo ""
         echo "Error when running configuration script for the second time."
         echo ">> Configuration aborted."
+        echo ""
+
         exit 1
     fi
-fi
 
-# QGC installation checks (separate from main configuration)
-if [ ! -f "$QGC_FLAG_FILE_I" ]; then
     runuser -l harpia -c "source /home/harpia/.bashrc && \
                           bash $HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh"
     exit $?
+
 elif [ ! -f "$QGC_FLAG_FILE_II" ]; then
     runuser -l harpia -c "source /home/harpia/.bashrc && \
                           bash $HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh"
