@@ -106,7 +106,7 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
     echo ""
 
     # Install dependencies
-    pip install -U "empy==3.3.4" pyros-genmsg setuptools catkin_pkg lark
+    pip install -U "empy==3.3.4" pyros-genmsg setuptools catkin_pkg lark PyQt5 PySide2
     apt-get update
     apt-get install -y python3-colcon-common-extensions
     apt-get install -y "ros-$ROS_DISTRO-desktop python3-argcomplete"
