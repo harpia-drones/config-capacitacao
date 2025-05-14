@@ -6,6 +6,6 @@ cd /root/PX4-Autopilot/Tools/simulation/gz/models
 rm -rf x500_mono_cam
 
 # Copy models directory
-cp -r /root/dependencies/models/x500_mono_cam /root/PX4-Autopilot/Tools/simulation/gz/models/
-cp -r /root/dependencies/models/realsense_d435 /root/PX4-Autopilot/Tools/simulation/gz/models/
-cp -r /root/dependencies/models/realsense_d435_2 /root/PX4-Autopilot/Tools/simulation/gz/models/
+cp -r /root/dependencies/models/x500_mono_cam .
+cp -r /root/dependencies/models/realsense_d435 .
+cp -r /root/dependencies/models/realsense_d435_2 .
