@@ -43,6 +43,8 @@ if [ ! -f "/root/harpia_venv/bin/activate" ]; then
     python3 -m venv harpia_venv && \
 
     # Configure to activate venv everytime a new bash terminal is open
+    echo " " >> /root/.bashrc
+    echo "# Activate python virtual environment"
     echo "source /root/harpia_venv/bin/activate" >> /root/.bashrc
 
     if [ $? -ne 0 ]; then        
@@ -155,6 +157,9 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
     curl -L "https://raw.githubusercontent.com/harpia-drones/config/main/qgc_install.sh" -o "$HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh"
     chmod a+rwx "$HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh"
     echo "alias setup='bash $HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh'" >> /home/harpia/.bashrc
+
+    echo " " >> /root/.bashrc
+    echo "# Alias to launch QGControl"
     echo "alias qgc=\"runuser -l harpia -c 'DISPLAY=:0 /usr/local/bin/QGroundControl.AppImage'\"" >> /root/.bashrc
 
     if [ $? -eq 0 ]; then
