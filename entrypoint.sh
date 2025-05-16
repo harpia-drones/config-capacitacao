@@ -22,6 +22,9 @@ DEP_FLAG_FILE="$DEPEND_FOLDER_PATH/package_creation/templates/minimum_node.py"
 FLAG_FILE_I="$CONFIG_FOLDER_PATH/.setup_done_i"
 FLAG_FILE_II="$CONFIG_FOLDER_PATH/.setup_done_ii"
 
+# Requirements.txt path file
+REQUIREMENTS_PATH="$CONFIG_FOLDER_PATH/requirements.txt"
+
 # Path to ros2 workspace
 WS_DIR_PATH=$(find "$HOME" -type d -name "*_ws" -print -quit)
 
@@ -88,9 +91,6 @@ if [ ! -f "$FLAG_FILE_I" ]; then
         echo "=================================================================="
         echo "  PX4-Autopilot installed successfully!"        
         echo "=================================================================="
-        echo ""
-        echo ">> You must restart the container."
-        echo ""
         exit 0
     else
         echo ""
@@ -102,17 +102,28 @@ if [ ! -f "$FLAG_FILE_I" ]; then
 # Second configuration stage
 elif [ ! -f "$FLAG_FILE_II" ]; then
     echo ""
+    echo "======================================================================="
+    echo "  Installing python libs..."          
+    echo "======================================================================="
+    echo ""
+
+    # Install python libs
+    python3 -m pip install -r /root/config/requirements.txt
+
+    echo ""
+    echo "======================================================================="
+    echo "  Installing aditional packages..."          
+    echo "======================================================================="
+    echo ""
+
+    # Install dependencies
+    bash /root/config/install_packages.sh
+
+    echo ""
     echo "=================================================================="
     echo "  Installing Micro-XRCE..."           
     echo "=================================================================="
     echo ""
-
-    # Install dependencies
-    pip install -U "empy==3.3.4" pyros-genmsg setuptools catkin_pkg lark PyQt5 PySide2
-    apt-get update
-    apt-get install -y python3-colcon-common-extensions
-    apt-get install -y "ros-$ROS_DISTRO-desktop python3-argcomplete"
-    apt-get install -y ros-dev-tools
 
     # Install XRCE-DDS Agent
     cd "/root/" && \

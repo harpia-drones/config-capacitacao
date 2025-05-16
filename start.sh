@@ -41,22 +41,16 @@ if [ ! -f "$DEP_FLAG_FILE" ]; then
     echo "# Alias to build ros2 workspace" >> /root/.bashrc
     echo "alias cb='colcon build && source /root/.bashrc'" >> /root/.bashrc
 
-    # Create config folder
-    mkdir -p /root/config
-
-    # Clone the entrypoint.sh
-    curl -L "https://raw.githubusercontent.com/harpia-drones/config/refs/heads/main/entrypoint.sh" -o /root/config/entrypoint.sh && \
-    chmod +x /root/config/entrypoint.sh
-
-    # Clone the eletroquad_world.sh
-    curl -L "https://raw.githubusercontent.com/harpia-drones/config/refs/heads/main/eletroquad_world.sh" -o /root/config/eletroquad_world.sh && \
-    chmod +x /root/config/eletroquad_world.sh
-
-    # Clone the eletroquad_model.sh
-    curl -L "https://raw.githubusercontent.com/harpia-drones/config/refs/heads/main/eletroquad_model.sh" -o /root/config/eletroquad_model.sh && \
-    chmod +x /root/config/eletroquad_model.sh
+    # Cloning config folder
+    echo ""
+    echo ">> Cloning config folder..."
+    echo " "
+    cd "/root" && \
+    git clone git@github.com:harpia-drones/config.git && \
+    chmod -R a+x /root/config 
 
     # Clone dependencies folder 
+    echo ""
     echo ">> Cloning dependencies folder..."
     echo " "
     cd "/root" && \
@@ -67,8 +61,6 @@ if [ ! -f "$DEP_FLAG_FILE" ]; then
         echo "=================================================================="
         echo "  Inital configuration done..."
         echo "=================================================================="
-        echo ""
-        echo ">> now run \"bashrc\" and then run \"setup\" to install the dependencies"
         echo ""
 
         # Exit the script returing a success code

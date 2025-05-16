@@ -1,0 +1,7 @@
+empy==3.3.4
+pyros-genmsg
+setuptools
+catkin_pkg
+lark
+PyQt5
+PySide2

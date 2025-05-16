@@ -34,8 +34,6 @@ if [ ! -f "$QGC_FLAG_FILE_I" ]; then
         echo "  Process done."           
         echo "======================================================================="
         echo ""
-        echo ">> You must restart the container."
-        echo ""
 
         # Create flag file
         sudo touch "$QGC_FLAG_FILE_I"
