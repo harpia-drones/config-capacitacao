@@ -46,8 +46,8 @@ if [ ! -f "/root/harpia_venv/bin/activate" ]; then
     python3 -m venv harpia_venv && \
 
     # Configure to activate venv everytime a new bash terminal is open
-    echo " " >> /root/.bashrc
-    echo "# Activate python virtual environment"
+    echo "" >> /root/.bashrc >> /root/.bashrc
+    echo "# Activate python virtual environment" >> /root/.bashrc
     echo "source /root/harpia_venv/bin/activate" >> /root/.bashrc
 
     if [ $? -ne 0 ]; then        
@@ -79,6 +79,9 @@ if [ ! -f "$FLAG_FILE_I" ]; then
     
     # Install the PX4 development toolchain
     cd "/root" && \
+    echo "" && \
+    echo ">> Cloning PX4-Autopilot folder..." && \
+    echo "" && \
     git clone git@github.com:PX4/PX4-Autopilot.git --recursive && \
     bash /root/PX4-Autopilot/Tools/setup/ubuntu.sh 
 
@@ -127,6 +130,11 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
 
     # Install XRCE-DDS Agent
     cd "/root/" && \
+
+    echo "" && \
+    echo ">> Cloning config folder..." && \
+    echo "" && \
+
     git clone git@github.com:eProsima/Micro-XRCE-DDS-Agent.git && \
     cd Micro-XRCE-DDS-Agent && \
     mkdir build && \
@@ -139,8 +147,23 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
     # Clone packages
     mkdir -p "$WS_DIR_PATH/src"
     cd "$WS_DIR_PATH/src"
+
+    echo "" && \
+    echo ">> Cloning px4_msgs folder..." && \
+    echo "" && \
+
     git clone git@github.com:PX4/px4_msgs.git
+
+    echo ""
+    echo ">> Cloning offboard_control folder..."
+    echo ""
+
     git clone git@github.com:harpia-drones/offboard_control.git
+
+    echo ""
+    echo ">> Cloning offboard_control_bringup folder..."
+    echo ""
+
     git clone git@github.com:harpia-drones/offboard_control_bringup.git
 
     # Import the drone model into px4 (adapt existing model)
@@ -154,6 +177,10 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
     echo 'root:senha' | chpasswd
 
     # Create a new user named harpia
+    echo ""
+    echo ">> Creating a new user named 'harpia'..."
+    echo ""
+
     useradd -m -s /bin/bash harpia
     echo 'harpia:senha' | chpasswd
     usermod -aG sudo harpia
