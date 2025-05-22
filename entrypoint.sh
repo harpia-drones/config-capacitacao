@@ -154,18 +154,6 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
 
     git clone git@github.com:PX4/px4_msgs.git
 
-    echo ""
-    echo ">> Cloning offboard_control folder..."
-    echo ""
-
-    git clone git@github.com:harpia-drones/offboard_control.git
-
-    echo ""
-    echo ">> Cloning offboard_control_bringup folder..."
-    echo ""
-
-    git clone git@github.com:harpia-drones/offboard_control_bringup.git
-
     # Import the drone model into px4 (adapt existing model)
     bash /root/config/eletroquad_model.sh
 
@@ -192,7 +180,7 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
 
     # QGC setup preparation
     mkdir -p "$HARPIA_CONFIG_FOLDER_PATH"
-    curl -L "https://raw.githubusercontent.com/harpia-drones/config/main/qgc_install.sh" -o "$HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh"
+    curl -L "https://raw.githubusercontent.com/harpia-drones/config-capacitacao/main/qgc_install.sh" -o "$HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh"
     chmod a+rwx "$HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh"
     echo "alias setup='bash $HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh'" >> /home/harpia/.bashrc
 
