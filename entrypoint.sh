@@ -130,11 +130,6 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
 
     # Install XRCE-DDS Agent
     cd "/root/" && \
-
-    echo "" && \
-    echo ">> Cloning config folder..." && \
-    echo "" && \
-
     git clone git@github.com:eProsima/Micro-XRCE-DDS-Agent.git && \
     cd Micro-XRCE-DDS-Agent && \
     mkdir build && \
@@ -180,7 +175,7 @@ elif [ ! -f "$FLAG_FILE_II" ]; then
 
     # QGC setup preparation
     mkdir -p "$HARPIA_CONFIG_FOLDER_PATH"
-    curl -L "https://raw.githubusercontent.com/harpia-drones/config-capacitacao/main/qgc_install.sh" -o "$HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh"
+    cp /root/config/qgc_install.sh "$HARPIA_CONFIG_FOLDER_PATH/"
     chmod a+rwx "$HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh"
     echo "alias setup='bash $HARPIA_CONFIG_FOLDER_PATH/qgc_install.sh'" >> /home/harpia/.bashrc
 
